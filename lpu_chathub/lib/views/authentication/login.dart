@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lpu_chathub/views/authentication/signup.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -151,7 +152,9 @@ class _LoginPageState extends State<LoginPage> {
                     width: MediaQuery.of(context).size.width,
                     // Login Button
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                       
+                      },
                       style: ElevatedButton.styleFrom(
                           shape: const StadiumBorder(),
                           backgroundColor: Colors.white),
@@ -176,7 +179,9 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(color: Colors.white, fontSize: 18.0),
                       ),
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                             Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const SignUpPage()));
+                          },
                           child: const Text(
                             'Sign Up',
                             style: TextStyle(
