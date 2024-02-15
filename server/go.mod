@@ -4,6 +4,7 @@ go 1.22.0
 
 require (
 	github.com/AfterShip/email-verifier v1.4.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.5.1
 	go.mongodb.org/mongo-driver v1.13.1

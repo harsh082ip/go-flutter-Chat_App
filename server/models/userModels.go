@@ -11,3 +11,8 @@ type User struct {
 	UserId          string             `json:"userid"`
 	Profile_Pic_Url string             `json:"profile_pic_urlllll"`
 }
+
+type LoginUser struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}

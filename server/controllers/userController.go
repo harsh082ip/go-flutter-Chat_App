@@ -9,9 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/database"
 	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/helpers"
+	authhelper "github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/helpers/authHelper"
 	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // SignUp handles the sign-up functionality.
@@ -164,4 +166,71 @@ func SignUp(c *gin.Context) {
 		})
 		return
 	}
+}
+
+func Login(c *gin.Context) {
+	// Decode the request body into a LoginUser struct
+	var loginUser models.LoginUser
+	if err := json.NewDecoder(c.Request.Body).Decode(&loginUser); err != nil {
+		// Return a bad request response if there's an error decoding the body
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "Error in Decoding the Body",
+			"error":  err.Error(),
+		})
+		return
+	}
+
+	// Open the MongoDB collection for users
+	collName := "Users"
+	coll := database.OpenCollection(database.Client, collName)
+
+	// Find the user with the provided email in the database
+	var result models.LoginUser
+	err := coll.FindOne(context.TODO(), bson.D{
+		{"email", loginUser.Email},
+	}).Decode(&result)
+	if err != nil {
+		// Handle document not found error
+		if err == mongo.ErrNoDocuments {
+			c.JSON(http.StatusNotFound, gin.H{
+				"status": "Error in Document",
+				"error":  "No User found with the given details",
+			})
+			return
+		}
+		// Handle internal server error while searching for the user
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Internal Server Error",
+			"error":  "Error is searching for user",
+		})
+		return
+	}
+
+	// Compare the hashed password from the database with the input password
+	err = helpers.ComparePassword(result.Password, loginUser.Password)
+	if err != nil {
+		// Return unauthorized access response if passwords do not match
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status": "Unauthorized Access",
+			"error":  "Password Mismatch",
+		})
+		return
+	}
+
+	// Generate JWT token for the authenticated user
+	userJwtToken, err := authhelper.GenerateJwtToken(loginUser.Email)
+	if err != nil {
+		// Handle error in generating JWT token
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Error in Generating token",
+			"error":  err.Error(),
+		})
+		return
+	}
+
+	// Return successful login response with JWT token
+	c.JSON(http.StatusOK, gin.H{
+		"status":    "All Good! User Login Successful",
+		"Jwt_Token": userJwtToken,
+	})
 }
