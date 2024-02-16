@@ -15,6 +15,7 @@ func main() {
 
 	routes.AuthRoutes(router)
 	routes.MiscRoutes(router)
+	routes.UserRoutes(router)
 
 	router.Run(WEBPORT)
 
