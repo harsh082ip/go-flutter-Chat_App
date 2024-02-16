@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:lpu_chathub/views/authentication/add_profile_screen.dart';
 import 'package:lpu_chathub/views/authentication/login.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -161,7 +163,9 @@ class _SignUpPageState extends State<SignUpPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                    Get.off(const AddProfileScreen());
+                    },
                     style: ElevatedButton.styleFrom(
                       shape: const StadiumBorder(),
                       backgroundColor: Colors.white,
@@ -189,7 +193,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/');
+                          Get.off(const LoginPage());
                         },
                         child: const Text(
                           'Login',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lpu_chathub/views/authentication/signup.dart';
 
 class LoginPage extends StatefulWidget {
@@ -180,7 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       TextButton(
                           onPressed: () {
-                             Navigator.pushReplacementNamed(context, '/signup');
+                             Get.off(const SignUpPage());
                           },
                           child: const Text(
                             'Sign Up',

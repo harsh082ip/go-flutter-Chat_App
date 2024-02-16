@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:lpu_chathub/views/authentication/login.dart';
-import 'package:lpu_chathub/views/authentication/signup.dart';
 
 void main(){
   runApp(const MyApp());
@@ -11,13 +11,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
+    return  const GetMaterialApp(
       debugShowCheckedModeBanner: false,
       home:LoginPage(),
-      routes: {
-        '/':(context) => const LoginPage(),
-        '/signup':(context) => const SignUpPage(),
-      },
     );
   }
 }
