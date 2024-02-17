@@ -8,4 +8,5 @@ import (
 func UserRoutes(incomingRoutes *gin.Engine) {
 
 	incomingRoutes.GET("/user/getuserbyusername/:username", usersController.GetUserByUsername)
+	incomingRoutes.GET("/user/addtorecentlyviewed/:uid", usersController.AddUserToRecentlyViewed)
 }

@@ -40,3 +40,9 @@ func OpenCollection(client *mongo.Client, collectionName string) *mongo.Collecti
 	var collection *mongo.Collection = client.Database("lpu_chathub").Collection(collectionName)
 	return collection
 }
+
+func OpenDatabase(client *mongo.Client, dbName string) *mongo.Database {
+
+	var database *mongo.Database = client.Database(dbName)
+	return database
+}

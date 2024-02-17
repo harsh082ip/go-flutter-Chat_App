@@ -16,3 +16,8 @@ type LoginUser struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type RecentlyViewed struct {
+	ID      primitive.ObjectID `bson:"_id"`
+	UserIDs []string           `json:"userIDs"`
+}
