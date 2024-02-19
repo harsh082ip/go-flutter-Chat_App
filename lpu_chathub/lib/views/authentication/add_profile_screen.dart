@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lpu_chathub/controller/apis/auth_api.dart';
 import 'dart:developer';
 import 'dart:io';
 import 'package:lpu_chathub/controller/profile_pic_controller.dart';
 import 'package:lpu_chathub/views/screens/home.dart';
 
 class AddProfileScreen extends StatefulWidget {
-  const AddProfileScreen({Key? key});
+  String name;
+  String email;
+  String password;
+  AddProfileScreen({Key? key, required this.name, required this.email, required this.password});
 
   @override
   State<AddProfileScreen> createState() => _AddProfileScreenState();
@@ -119,8 +123,25 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                     shape: const StadiumBorder(),
                   ),
                   onPressed: () {
+
+                    if (imgpath != null && widget.name != "" && widget.email != "" && widget.password != "" && usernameController.text.isNotEmpty) {
+                    Get.defaultDialog(
+                      title: 'Please Wait...',
+                      content: const Center(
+                        child: CircularProgressIndicator(color: Colors.white,),
+                      )
+                    );
                     log(imgpath!.path+usernameController.text);
-                    Get.off(HomePage());
+                    AuthApis.signUp(imgpath!.path, widget.name, widget.email, widget.password, usernameController.text);
+                    } else {
+                      Get.defaultDialog(
+                        title: 'Details Missing...',
+                        content: const Center(
+                          child: Text("Please fill out all the details to continue..."),
+                        )
+                      );
+                    }
+                 
                   },
                   child: const Text(
                     'Next',

@@ -13,6 +13,9 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   // Boolean to track if the password is visible or not
   bool isPasswordVisible = false;
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +84,7 @@ class _SignUpPageState extends State<SignUpPage> {
                  const SizedBox(height: 30), // Added space for better separation
                   // Name TextFormField
                   TextFormField(
+                    controller: nameController,
                     style: const TextStyle(color: Colors.white),
                     decoration: const InputDecoration(
                       focusedBorder: UnderlineInputBorder(
@@ -104,6 +108,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(height: 30), // Added space for better separation
                   // Email Field
                   TextFormField(
+                    controller: emailController,
                     style: const TextStyle(color: Colors.white),
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
@@ -128,6 +133,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(height: 30), // Added space for better separation
                   // Password TextFormField
                   TextFormField(
+                    controller: passwordController,
                     style: const TextStyle(color: Colors.white),
                     obscureText: !isPasswordVisible,
                     decoration: InputDecoration(
@@ -164,7 +170,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                    Get.to(const AddProfileScreen());
+                    Get.to( AddProfileScreen(name: nameController.text, email: emailController.text, password: passwordController.text,));
                     },
                     style: ElevatedButton.styleFrom(
                       shape: const StadiumBorder(),

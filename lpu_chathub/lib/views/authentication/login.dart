@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lpu_chathub/views/authentication/signup.dart';
+import 'package:lpu_chathub/views/screens/home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -154,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                     // Login Button
                     child: ElevatedButton(
                       onPressed: () {
-                       
+                       Get.to(HomePage());
                       },
                       style: ElevatedButton.styleFrom(
                           shape: const StadiumBorder(),
