@@ -5,9 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:lpu_chathub/views/screens/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Class containing API methods related to authentication.
 class AuthApis {
+
+
+  static String baseUrl = "http://172.28.9.238:8006";
 
   /// Method for signing up a user.
   ///
@@ -20,8 +24,9 @@ class AuthApis {
   static Future<void> signUp(String imgPath, String name, String email, String password, String username) async{
     
     // Change the baseUrl Accordingly
-    var baseUrl = "http://192.168.117.132:8006/";
-    var url = Uri.parse("$baseUrl/signup");
+    
+    var url = Uri.parse("$baseUrl/users/signup");
+    print(url.toString());
 
     var request = http.MultipartRequest("POST", url);
     request.fields['data'] = json.encode({
@@ -80,5 +85,41 @@ class AuthApis {
           )
         );
     }
+  }
+
+
+  static Future<void> login(String username, String password) async{
+
+    var url = Uri.parse("$baseUrl/users/login");
+    print(url.toString());
+   
+    var response = await http.post(url,
+      headers: <String, String> {
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: json.encode({
+        "username": username,
+        "password": password,
+      }));
+
+      if (response.statusCode == 200) {
+        print(response.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        var res = jsonDecode(response.body);
+        var token = res['Jwt_Token'];
+        prefs.setString('token', token);
+        Get.offAll(HomePage());
+      } else {
+
+        Get.back();
+        Get.defaultDialog(
+          title: 'Error While Login',
+          content: Center(
+            child: Text('Error: ${response.body}'),
+          ),
+        );
+        print('Failed to login: ${response.body}');
+        print(response.statusCode);
+      }
   }
 }

@@ -37,7 +37,7 @@ func UploadToMongoDB(file multipart.File, header *multipart.FileHeader) (string,
 
 	// Get ObjectID and construct download URL
 	objectID := uploadStream.FileID.(primitive.ObjectID)
-	downloadURL := fmt.Sprintf("http://localhost:8006/download/%s", objectID.Hex())
+	downloadURL := fmt.Sprintf("http://192.168.117.132:8006/download/%s", objectID.Hex())
 
 	return downloadURL, nil
 }

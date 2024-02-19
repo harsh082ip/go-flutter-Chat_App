@@ -3,6 +3,7 @@ package authController
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"net/http"
 
@@ -179,6 +180,7 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
+	fmt.Println("I am here.....")
 
 	// Open the MongoDB collection for users
 	collName := "Users"
@@ -187,12 +189,12 @@ func Login(c *gin.Context) {
 	// Find the user with the provided email in the database
 	var result models.LoginUser
 	err := coll.FindOne(context.TODO(), bson.D{
-		{"email", loginUser.Email},
+		{"username", loginUser.Username},
 	}).Decode(&result)
 	if err != nil {
 		// Handle document not found error
 		if err == mongo.ErrNoDocuments {
-			c.JSON(http.StatusNotFound, gin.H{
+			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "Error in Document",
 				"error":  "No User found with the given details",
 			})
@@ -218,7 +220,7 @@ func Login(c *gin.Context) {
 	}
 
 	// Generate JWT token for the authenticated user
-	userJwtToken, err := authhelper.GenerateJwtToken(loginUser.Email)
+	userJwtToken, err := authhelper.GenerateJwtToken(loginUser.Username)
 	if err != nil {
 		// Handle error in generating JWT token
 		c.JSON(http.StatusInternalServerError, gin.H{

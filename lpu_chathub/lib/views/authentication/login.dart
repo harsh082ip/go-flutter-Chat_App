@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lpu_chathub/controller/apis/auth_api.dart';
 import 'package:lpu_chathub/views/authentication/signup.dart';
 import 'package:lpu_chathub/views/screens/home.dart';
 
@@ -13,6 +14,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   // Boolean to track if the password is visible or not
   bool isPasswordVisible = false;
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     // Username TextFormField
                     TextFormField(
+                      controller: usernameController,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         focusedBorder: UnderlineInputBorder(
@@ -102,6 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     // Password TextFormField
                     TextFormField(
+                      controller: passwordController,
                       style: const TextStyle(color: Colors.white),
                       obscureText: !isPasswordVisible,
                       decoration: InputDecoration(
@@ -155,7 +160,24 @@ class _LoginPageState extends State<LoginPage> {
                     // Login Button
                     child: ElevatedButton(
                       onPressed: () {
-                       Get.to(HomePage());
+
+                       if (usernameController.text.isNotEmpty && passwordController.text.isNotEmpty) {
+                        AuthApis.login(usernameController.text, passwordController.text);
+                        Get.defaultDialog(
+                          title: 'Please Wait...',
+                          content: Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        );
+                        
+                       } else {
+                        Get.defaultDialog(
+                          title: 'Details Missing...',
+                          content: Center(
+                            child: Text('Username and password cannot be empty '),
+                          ),
+                        );
+                       }
                       },
                       style: ElevatedButton.styleFrom(
                           shape: const StadiumBorder(),
