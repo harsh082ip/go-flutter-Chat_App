@@ -164,7 +164,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                    Get.off(const AddProfileScreen());
+                    Get.to(const AddProfileScreen());
                     },
                     style: ElevatedButton.styleFrom(
                       shape: const StadiumBorder(),

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:lpu_chathub/controller/profile_pic_controller.dart';
+import 'package:lpu_chathub/views/screens/home.dart';
 
 class AddProfileScreen extends StatefulWidget {
   const AddProfileScreen({Key? key});
@@ -119,6 +120,7 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                   ),
                   onPressed: () {
                     log(imgpath!.path+usernameController.text);
+                    Get.off(HomePage());
                   },
                   child: const Text(
                     'Next',
