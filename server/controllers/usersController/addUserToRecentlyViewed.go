@@ -47,7 +47,7 @@ func AddUserToRecentlyViewed(c *gin.Context) {
 
 		if docExists && userExists && usernameExists {
 			// Check if the username already exists in the document
-			status, _ := helpers.HasElement(collName, username)
+			status, _ := helpers.HasElement(collName, username, "userids")
 			if !status {
 				// If username does not exist, update the document by adding the username
 				objId, err := primitive.ObjectIDFromHex(uid)

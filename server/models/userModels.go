@@ -21,3 +21,8 @@ type RecentlyViewed struct {
 	ID      primitive.ObjectID `bson:"_id"`
 	UserIDs []string           `json:"userIDs"`
 }
+
+type RecentChats struct {
+	ID        primitive.ObjectID `bson:"_id"`
+	Usernames []string           `json:"usernames"`
+}
