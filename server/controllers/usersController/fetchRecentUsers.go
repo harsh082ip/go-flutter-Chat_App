@@ -1,3 +1,4 @@
+// Package usersController provides handlers for user-related endpoints.
 package usersController
 
 import (
@@ -15,14 +16,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// FetchRecentUsers fetches recent users for a given user ID.
 func FetchRecentUsers(c *gin.Context) {
 
+	// Extract user ID and JWT token from request parameters.
 	uid := c.Param("uid")
-	jwt_token := c.Query("jwtkey")
+	jwtToken := c.Query("jwtkey")
 
-	if uid != "" && jwt_token != "" {
+	// Ensure both user ID and JWT token are provided.
+	if uid != "" && jwtToken != "" {
 
-		_, err := authhelper.CheckAuthorization(jwt_token)
+		// Check the validity of the JWT token.
+		_, err := authhelper.CheckAuthorization(jwtToken)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"status": "Unauthorized Access",
@@ -31,6 +36,7 @@ func FetchRecentUsers(c *gin.Context) {
 			return
 		}
 
+		// Check if a document exists for the recent user views.
 		collName := "Recently_Viewed"
 		docExists, _ := helpers.CheckIfDocumentExists(uid, collName, true)
 		if !docExists {
@@ -41,24 +47,26 @@ func FetchRecentUsers(c *gin.Context) {
 			return
 		}
 
-		objId, err := primitive.ObjectIDFromHex(uid)
+		// Convert user ID string to ObjectID.
+		objID, err := primitive.ObjectIDFromHex(uid)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"status": "Error in Creatinig an ObjectId",
+				"status": "Error in Creating an ObjectId",
 				"error":  err.Error(),
 			})
 			return
 		}
-		filter := bson.D{{"_id", objId}}
-		var recent_view models.RecentlyViewed
+		filter := bson.D{{"_id", objID}}
+		var recentView models.RecentlyViewed
 
+		// Retrieve the recently viewed users document from the database.
 		coll := database.OpenCollection(database.Client, collName)
 
-		err = coll.FindOne(context.TODO(), filter).Decode(&recent_view)
+		err = coll.FindOne(context.TODO(), filter).Decode(&recentView)
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
 				c.JSON(http.StatusBadRequest, gin.H{
-					"status": "Doc. Not Found with the uid",
+					"status": "Document Not Found with the UID",
 					"error":  err.Error(),
 				})
 				return
@@ -70,10 +78,11 @@ func FetchRecentUsers(c *gin.Context) {
 			return
 		}
 
+		// Retrieve users based on their usernames.
 		usersCollName := "Users"
 		usersColl := database.OpenCollection(database.Client, usersCollName)
-		fmt.Println("User IDs to search:", recent_view.UserIDs) // Log user IDs for debugging
-		cursor, err := usersColl.Find(context.TODO(), bson.M{"username": bson.M{"$in": recent_view.UserIDs}})
+		fmt.Println("User IDs to search:", recentView.UserIDs) // Log user IDs for debugging
+		cursor, err := usersColl.Find(context.TODO(), bson.M{"username": bson.M{"$in": recentView.UserIDs}})
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
 				c.JSON(http.StatusInternalServerError, gin.H{
@@ -89,6 +98,7 @@ func FetchRecentUsers(c *gin.Context) {
 			return
 		}
 
+		// Decode the retrieved users.
 		var users []models.User
 		if err := cursor.All(context.TODO(), &users); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -98,17 +108,20 @@ func FetchRecentUsers(c *gin.Context) {
 			return
 		}
 
+		// Return the fetched users.
 		if users != nil {
 			c.JSON(http.StatusOK, users)
 			return
 		}
 
+		// No users found.
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status": "No Users Found",
-			"error":  "Recents may be empty",
+			"error":  "Recent views may be empty",
 		})
 
 	} else {
+		// Missing user ID or JWT token.
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status": "Missing Details",
 			"error":  "Please provide all the details",
