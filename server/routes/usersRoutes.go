@@ -11,7 +11,7 @@ func UserRoutes(incomingRoutes *gin.Engine) {
 	incomingRoutes.GET("/user/addtorecentlyviewed/:uid", usersController.AddUserToRecentlyViewed)
 	incomingRoutes.GET("/user/fetchrecentusers/:uid", usersController.FetchRecentUsers)
 	incomingRoutes.GET("/user/removerecentuser/:uid", usersController.RemoveRecentUser)
-	incomingRoutes.GET("/user/addtorecentchats/:uid", usersController.AddUserToRecentChats)
+	incomingRoutes.GET("/user/addtorecentchats/:uid", usersController.AddUserToRecentChatsAndCreateRoom)
 	incomingRoutes.GET("/user/fetchhomedata/:uid", usersController.FetchHomeUsers)
 	incomingRoutes.GET("/user/removehomeuser/:uid", usersController.RemoveHomeUsers)
 }
