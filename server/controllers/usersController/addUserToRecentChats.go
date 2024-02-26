@@ -71,10 +71,10 @@ func AddUserToRecentChatsAndCreateRoom(c *gin.Context) {
 		collName := "Recent_Chats"
 		coll := database.OpenCollection(database.Client, collName)
 
-		hub := &models.Hub{}
+		hub := &ws.Hub{}
 
 		handler := ws.NewHandler(hub)
-		var Room models.Room
+		var Room ws.Room
 
 		// If all conditions met, update usernames if not present
 		if usernameExists && UidExists && client1usernameExists && docExists {

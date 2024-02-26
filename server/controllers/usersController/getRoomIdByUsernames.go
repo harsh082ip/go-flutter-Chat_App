@@ -8,8 +8,7 @@ import (
 	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/database"
 	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/helpers"
 	authhelper "github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/helpers/authHelper"
-
-	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/models"
+	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/ws"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -57,7 +56,7 @@ func GetRoomIDByUsernames(c *gin.Context) {
 			coll := database.OpenCollection(database.Client, roomCollName)
 
 			filter := bson.M{"participants": bson.M{"$all": []string{username1, username2}}}
-			var room models.Room
+			var room ws.Room
 			err = coll.FindOne(context.Background(), filter).Decode(&room)
 			if err != nil {
 				if err == mongo.ErrNoDocuments {

@@ -3,9 +3,10 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/controllers/usersController"
+	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/ws"
 )
 
-func UserRoutes(incomingRoutes *gin.Engine) {
+func UserRoutes(incomingRoutes *gin.Engine, wsHandler *ws.Handler) {
 
 	incomingRoutes.GET("/user/getuserbyusername/:username", usersController.GetUserByUsername)
 	incomingRoutes.GET("/user/addtorecentlyviewed/:uid", usersController.AddUserToRecentlyViewed)
@@ -15,4 +16,5 @@ func UserRoutes(incomingRoutes *gin.Engine) {
 	incomingRoutes.GET("/user/fetchhomedata/:uid", usersController.FetchHomeUsers)
 	incomingRoutes.GET("/user/removehomeuser/:uid", usersController.RemoveHomeUsers)
 	incomingRoutes.GET("/user/getroomidbyusernames", usersController.GetRoomIDByUsernames)
+	incomingRoutes.GET("/ws/joinroom/:roomId", wsHandler.JoinRoom)
 }
