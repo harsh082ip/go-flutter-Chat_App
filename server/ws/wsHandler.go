@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/database"
+	wshelper "github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/helpers/wsHelper"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -65,15 +66,17 @@ func (h *Handler) JoinRoom(c *gin.Context) {
 	clientID := c.Query("uid")
 	username := c.Query("username")
 
+	connId := wshelper.GenerateConnID()
+	AddWebSocketConnection(connId, conn)
+
 	cl := &Client{
+		ConnId:   connId,
 		Conn:     conn,
 		Message:  make(chan *Message, 10),
 		Id:       clientID,
 		RoomID:   roomID,
 		Username: username,
 	}
-
-	log.Println("Connection: ", cl)
 
 	m := &Message{
 		Content:  "A new user has joined the room",
@@ -82,10 +85,10 @@ func (h *Handler) JoinRoom(c *gin.Context) {
 	}
 	log.Println("---------HERE 1-----------")
 	h.hub.Register <- cl
-	log.Println("Connection: ", conn)
+	// log.Println("Connection: ", conn)
 	log.Println("---------HERE 2-----------")
 	h.hub.Broadcast <- m
-	log.Println("Connection: ", conn)
+	// log.Println("Connection: ", conn)
 	log.Println("---------HERE 3-----------")
 	go cl.WriteMessage()
 	go cl.readMessage(h.hub)

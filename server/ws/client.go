@@ -10,6 +10,7 @@ import (
 
 type Client struct {
 	Conn     *websocket.Conn
+	ConnId   string
 	Message  chan *Message
 	Id       string `json:"id"`
 	RoomID   string `json:"roomId"`
@@ -21,6 +22,8 @@ type Message struct {
 	RoomID   string `json:"roomId"`
 	Username string `json:"username"`
 }
+
+var ConnectionsMap map[string]*websocket.Conn = make(map[string]*websocket.Conn)
 
 func (c *Client) WriteMessage() {
 	defer func() {

@@ -30,7 +30,6 @@ type Room struct {
 }
 
 func (h *Hub) Run() {
-
 	for {
 		select {
 		case cl := <-h.Register:
@@ -50,6 +49,9 @@ func (h *Hub) Run() {
 				}
 			}
 			log.Println("---------HERE 7-----------")
+
+			// Add the WebSocket connection to the connectionsMap
+			AddWebSocketConnection(cl.Id, cl.Conn)
 
 		case cl := <-h.Unregister:
 			room, err := GetRoom(cl.RoomID)
@@ -77,6 +79,9 @@ func (h *Hub) Run() {
 				}
 			}
 
+			// Remove the WebSocket connection from the connectionsMap
+			RemoveWebSocketConnection(cl.Id)
+
 		case m := <-h.Broadcast:
 			log.Println("---------HERE 8-----------")
 			room, err := GetRoom(m.RoomID)
@@ -85,14 +90,23 @@ func (h *Hub) Run() {
 			}
 
 			if room != nil {
-				for _, cl := range room.Clients {
-					log.Println("---------HERE 9-----------")
-					log.Println(cl.Conn, cl.Message)
-					log.Println(cl)
-					cl.Message <- m
-				}
+				// Call BroadcastMessage function to send message to clients
+				h.BroadcastMessage(m, room.Clients)
 			}
+		}
+	}
+}
 
+// BroadcastMessage sends a message to all clients in the provided map
+func (h *Hub) BroadcastMessage(m *Message, clients map[string]*Client) {
+	for _, client := range clients {
+		// Check if the WebSocket connection is available
+		if conn := GetwebSocketConnection(client.ConnId); conn != nil {
+			// Send message over WebSocket connection
+			err := conn.WriteJSON(m)
+			if err != nil {
+				log.Println("Error sending message to client:", err)
+			}
 		}
 	}
 }

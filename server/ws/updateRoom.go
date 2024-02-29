@@ -2,6 +2,7 @@ package ws
 
 import (
 	"context"
+	"log"
 
 	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/database"
 	"go.mongodb.org/mongo-driver/bson"
@@ -37,9 +38,13 @@ func UpdateRoom(room *Room) error {
 func getSerializableClients(clients map[string]*Client) map[string]interface{} {
 	serializableClients := make(map[string]interface{})
 	for id, client := range clients {
+		log.Println("Conn: ", client.Conn)
 		serializableClient := map[string]interface{}{
+
 			"Id":       client.Id,
 			"Username": client.Username,
+			"ConnID":   client.ConnId,
+			// "Conn":     client.Conn,
 			// Add other serializable fields from the client struct here
 			// Exclude non-serializable fields like channels
 		}
