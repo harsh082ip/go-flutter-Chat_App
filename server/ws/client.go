@@ -32,27 +32,26 @@ func (c *Client) WriteMessage() {
 
 	for {
 		message, ok := <-c.Message
-		log.Println("---------HERE 10-----------")
 		if !ok {
 			return
 		}
 
-		log.Println("---------HERE 11-----------")
 		c.Conn.WriteJSON(message)
-		log.Println("---------HERE 12-----------")
 	}
 }
 
 func (c *Client) readMessage(hub *Hub) {
 	defer func() {
+		log.Println("ConnIddd:", c.ConnId)
+		log.Println("Unregistered...")
 		hub.Unregister <- c
+		log.Println("Unregistered 2...")
 		c.Conn.Close()
+		log.Println("Unregistered 3...")
 	}()
 
 	for {
-
 		_, m, err := c.Conn.ReadMessage()
-		log.Println("---------HERE 13-----------")
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
@@ -66,8 +65,6 @@ func (c *Client) readMessage(hub *Hub) {
 			Username: c.Username,
 		}
 
-		log.Println("---------HERE 14-----------")
 		hub.Broadcast <- msg
-		log.Println("---------HERE 15-----------")
 	}
 }

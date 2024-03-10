@@ -10,7 +10,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func GenerateJwtToken(Useremail string) (string, error) {
+func GenerateJwtToken(username string) (string, error) {
 
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -24,7 +24,8 @@ func GenerateJwtToken(Useremail string) (string, error) {
 
 		claims := &models.Claims{
 			CompanyName: "CyberSec Symposium",
-			Email:       Useremail,
+
+			Username: username,
 			StandardClaims: jwt.StandardClaims{
 				ExpiresAt: expirationTime.Unix(),
 			},

@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:lpu_chathub/models/user_model.dart';
+import 'package:lpu_chathub/shared_res/loggedin_user_singleton.dart';
+import 'package:lpu_chathub/views/authentication/login.dart';
 import 'package:lpu_chathub/views/screens/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthApis {
 
 
-  static String baseUrl = "http://172.28.9.238:8006";
+  static String baseUrl = "http://192.168.135.132:8006";
 
   /// Method for signing up a user.
   ///
@@ -62,7 +66,13 @@ class AuthApis {
       if (response.statusCode == 200) {
         // Successful sign-up
         print('Sign-up successful');
-        Get.offAll(HomePage());
+        Get.defaultDialog(
+          title: 'Sign Up Successful',
+          content: Text('Please login now'),
+          confirm: ElevatedButton(onPressed: () {}, child: Text('OK'))
+        );
+        Get.offAll(LoginPage());
+        Get.snackbar('Sign Up Successful', 'Please login now', backgroundColor: Colors.blue, snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, );
       } else {
         // Failed sign-up
         print('Sign-up failed with status code: ${response.statusCode}');
@@ -108,6 +118,17 @@ class AuthApis {
         var res = jsonDecode(response.body);
         var token = res['Jwt_Token'];
         prefs.setString('token', token);
+
+
+    //     Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+    // User user = User.fromJson(jsonResponse);
+    // LoggedInUserSingleton().setUser(user);
+    
+    // User? current = LoggedInUserSingleton().getUser();
+    // if (current != null) {
+    //   log(current.email);
+    // }
+    
         Get.offAll(HomePage());
       } else {
 

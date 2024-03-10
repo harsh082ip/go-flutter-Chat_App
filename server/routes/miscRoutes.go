@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/database"
+	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/ws"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/gridfs"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -44,5 +45,12 @@ func MiscRoutes(incomingRoutes *gin.Engine) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send image"})
 			return
 		}
+	})
+
+	incomingRoutes.GET("/download/getconnectionsmap", func(ctx *gin.Context) {
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"Connections": ws.ConnectionsMap,
+		})
 	})
 }

@@ -25,7 +25,7 @@ func NewHub() *Hub {
 type Room struct {
 	ID           primitive.ObjectID `bson:"_id"`
 	RoomID       string             `json:"id"`
-	Clients      map[string]*Client `json:"clients"`
+	Clients      []*Client          `json:"clients"`
 	Participants []string           `json:"participants"`
 }
 
@@ -33,25 +33,19 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case cl := <-h.Register:
-			log.Println("---------HERE 4-----------")
 			room, err := GetRoom(cl.RoomID)
-			log.Println("---------HERE 5-----------")
 			if err != nil {
 				log.Println("Error Fetching Room Details: ", err)
 				continue
 			}
-			log.Println("---------HERE 6-----------")
 			if room != nil {
-				room.Clients[cl.Id] = cl
+				room.Clients = append(room.Clients, cl)
 				err := UpdateRoom(room)
 				if err != nil {
 					log.Println("Error updating the room : ", err)
 				}
 			}
-			log.Println("---------HERE 7-----------")
-
-			// Add the WebSocket connection to the connectionsMap
-			AddWebSocketConnection(cl.Id, cl.Conn)
+			AddWebSocketConnection(cl.ConnId, cl.Conn)
 
 		case cl := <-h.Unregister:
 			room, err := GetRoom(cl.RoomID)
@@ -59,39 +53,37 @@ func (h *Hub) Run() {
 				log.Println("Error Fetching the Room Details: ", err)
 				continue
 			}
-
 			if room != nil {
-				if _, ok := room.Clients[cl.Id]; ok {
-					if len(room.Clients) != 0 {
-						h.Broadcast <- &Message{
-							Content:  "user left the chat",
-							RoomID:   cl.RoomID,
-							Username: cl.Username,
+				for i, client := range room.Clients {
+					if client == cl {
+						room.Clients = append(room.Clients[:i], room.Clients[i+1:]...)
+						err := UpdateRoom(room)
+						if err != nil {
+							log.Println("Error in Updating Room: ", err)
 						}
-					}
-
-					delete(room.Clients, cl.Id)
-
-					err := UpdateRoom(room)
-					if err != nil {
-						log.Println("Error in Updating Room: ", err)
+						break
 					}
 				}
 			}
-
-			// Remove the WebSocket connection from the connectionsMap
-			RemoveWebSocketConnection(cl.Id)
+			RemoveWebSocketConnection(cl.ConnId)
 
 		case m := <-h.Broadcast:
-			log.Println("---------HERE 8-----------")
 			room, err := GetRoom(m.RoomID)
 			if err != nil {
 				log.Println("Error Fetching Room Details: ", err)
+				continue
 			}
-
 			if room != nil {
-				// Call BroadcastMessage function to send message to clients
-				h.BroadcastMessage(m, room.Clients)
+				clientMap := make(map[string]*Client)
+				for _, client := range room.Clients {
+					clientMap[client.Id] = client
+				}
+				log.Println("Broadcasting message to all clients in the room...")
+				log.Println("Room Clients:")
+				for _, client := range clientMap {
+					log.Println(client.Id)
+				}
+				h.BroadcastMessage(m, clientMap)
 			}
 		}
 	}
@@ -100,10 +92,14 @@ func (h *Hub) Run() {
 // BroadcastMessage sends a message to all clients in the provided map
 func (h *Hub) BroadcastMessage(m *Message, clients map[string]*Client) {
 	for _, client := range clients {
+		// log.Println("Broad...")
+		// log.Println(client.ConnId)
 		// Check if the WebSocket connection is available
 		if conn := GetwebSocketConnection(client.ConnId); conn != nil {
+			// log.Println("Broad...")
 			// Send message over WebSocket connection
 			err := conn.WriteJSON(m)
+			// log.Println("Broaddd...")
 			if err != nil {
 				log.Println("Error sending message to client:", err)
 			}

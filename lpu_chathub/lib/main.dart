@@ -30,7 +30,8 @@ class _MyAppState extends State<MyApp> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print("This is what i have ${prefs.getString('token')}");
     token = prefs.getString('token') ?? ""; // Use null-aware operator
-    if (!JwtDecoder.isExpired(token)) {
+    if(token != "") {
+      if (!JwtDecoder.isExpired(token)) {
       setState(() {
         isExpired = false;
       });
@@ -39,6 +40,13 @@ class _MyAppState extends State<MyApp> {
         isExpired = true;
       });
     }
+    }
+    else {
+      setState(() {
+        isExpired = true;
+      });
+    }
+
   }
 
   @override

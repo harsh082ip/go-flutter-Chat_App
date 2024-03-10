@@ -56,6 +56,15 @@ func AddUserToRecentChatsAndCreateRoom(c *gin.Context) {
 			return
 		}
 
+		err = helpers.CheckIfUidAndUsernameOfSameUser(uid, username)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": "Bad Request",
+				"error":  err.Error(),
+			})
+			return
+		}
+
 		client1usernameExists, _ := helpers.CheckIfDocumentExists(client1username, usersCollName, false)
 		if !client1usernameExists {
 			c.JSON(http.StatusBadRequest, gin.H{

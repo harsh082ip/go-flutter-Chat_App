@@ -2,7 +2,6 @@ package ws
 
 import (
 	"context"
-	"log"
 
 	"github.com/harsh082ip/go-flutter-Chat_App/tree/main/server/database"
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,7 +9,6 @@ import (
 )
 
 func UpdateRoom(room *Room) error {
-
 	filter := bson.M{"_id": room.ID}
 
 	update := bson.M{
@@ -34,21 +32,15 @@ func UpdateRoom(room *Room) error {
 	return nil
 }
 
-// Helper function to get serializable client information
-func getSerializableClients(clients map[string]*Client) map[string]interface{} {
-	serializableClients := make(map[string]interface{})
-	for id, client := range clients {
-		log.Println("Conn: ", client.Conn)
+func getSerializableClients(clients []*Client) []interface{} {
+	var serializableClients []interface{}
+	for _, client := range clients {
 		serializableClient := map[string]interface{}{
-
 			"Id":       client.Id,
 			"Username": client.Username,
 			"ConnID":   client.ConnId,
-			// "Conn":     client.Conn,
-			// Add other serializable fields from the client struct here
-			// Exclude non-serializable fields like channels
 		}
-		serializableClients[id] = serializableClient
+		serializableClients = append(serializableClients, serializableClient)
 	}
 	return serializableClients
 }

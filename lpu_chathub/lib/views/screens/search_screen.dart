@@ -1,5 +1,10 @@
+import 'dart:developer';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lpu_chathub/controller/apis/search_api.dart';
+import 'package:lpu_chathub/models/user_model.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -9,6 +14,9 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final TextEditingController searchedText = TextEditingController();
+  bool isSearchTriggered = false;
+  User? user;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,13 +46,54 @@ class _SearchScreenState extends State<SearchScreen> {
                       horizontal: 10.0, vertical: 18.0),
                   child: SingleChildScrollView( // Added SingleChildScrollView
                     child: TextFormField(
+                      controller: searchedText,
                       style: const TextStyle(color: Colors.white),
-                      decoration:  const InputDecoration(
+                      decoration:   InputDecoration(
                         hintText: 'Search',
                         hintStyle:  TextStyle(color: Colors.white, fontSize: 18.0),
-                        prefixIcon:  Icon(
-                          Icons.search,
-                          color: Colors.white,
+                        prefixIcon: Visibility(
+                          visible: isSearchTriggered,
+                          child: InkWell(
+                            onTap: () {
+                             setState(() {
+                                isSearchTriggered = false;
+                             });
+                              searchedText.clear();
+                            },
+                            child: Icon(CupertinoIcons.multiply, color: Colors.white,),
+                          ),
+                        ),
+                        suffixIcon:  InkWell(
+                          onTap: () async{
+                            
+                             
+                            if(searchedText.text != "") {
+                              setState(() {
+                              isSearchTriggered = true;
+                            });
+                              // Show the default dialog at the bottom
+                            Get.defaultDialog(
+                            title: 'Please Wait...',
+                            titleStyle: TextStyle(color: Colors.white),
+                            backgroundColor: Colors.blue,
+                            content: Container(
+                            alignment: Alignment.bottomCenter, // Align content to the bottom
+                            child: CircularProgressIndicator(),
+                          ),);
+
+                              user = await SearchApis.searchUser(searchedText.text);
+                              log(user!.email.toString());
+                              log(user!.name.toString());
+                              log(user!.profilePicUrl.toString());
+                            }
+                            else {
+                              print("Empty");
+                            }
+                          },
+                          child: Icon(
+                            Icons.search,
+                            color: Colors.white,
+                          ),
                         ),
                         border: InputBorder.none, // Removed OutlineInputBorder
                       ),
@@ -57,11 +106,29 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Container(
                 margin: const EdgeInsets.all(15.0),
                 width: MediaQuery.of(context).size.width,
-                child: const Column(
+                child: isSearchTriggered != true ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Recents ', style: TextStyle(color: Colors.white, fontSize: 22.0))
                   ],
+                ) : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                      if (user != null) // Add a null check before accessing user properties
+                        InkWell(
+                          onTap: () {
+                            print('Pressed...');
+                          },
+                          child: Container(
+                              color: Colors.white,
+                            child: ListTile(
+                              title: Text(user!.name.toString()), // Use user!.name with null check operator
+                              leading: CircleAvatar(backgroundColor: Colors.teal, backgroundImage: NetworkImage(user!.profilePicUrl.toString()),),
+                              subtitle: Text(user!.email.toString()),
+                            ),
+                          ),
+                        ),
+                    ],
                 ),
               ),
             )

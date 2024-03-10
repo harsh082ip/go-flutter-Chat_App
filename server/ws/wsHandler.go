@@ -2,7 +2,8 @@ package ws
 
 import (
 	"context"
-	"log"
+
+	// "log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,7 +29,7 @@ func (h *Handler) CreateRoom(username1, username2 string) (Room, string, error) 
 	room := Room{
 		ID:           id,
 		RoomID:       id.Hex(),
-		Clients:      make(map[string]*Client),
+		Clients:      []*Client{},
 		Participants: []string{username1, username2},
 	}
 
@@ -53,6 +54,7 @@ var upgrader = websocket.Upgrader{
 }
 
 func (h *Handler) JoinRoom(c *gin.Context) {
+
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -67,7 +69,6 @@ func (h *Handler) JoinRoom(c *gin.Context) {
 	username := c.Query("username")
 
 	connId := wshelper.GenerateConnID()
-	AddWebSocketConnection(connId, conn)
 
 	cl := &Client{
 		ConnId:   connId,
@@ -83,13 +84,10 @@ func (h *Handler) JoinRoom(c *gin.Context) {
 		RoomID:   roomID,
 		Username: username,
 	}
-	log.Println("---------HERE 1-----------")
+
 	h.hub.Register <- cl
-	// log.Println("Connection: ", conn)
-	log.Println("---------HERE 2-----------")
 	h.hub.Broadcast <- m
-	// log.Println("Connection: ", conn)
-	log.Println("---------HERE 3-----------")
+
 	go cl.WriteMessage()
 	go cl.readMessage(h.hub)
 }

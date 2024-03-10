@@ -9,7 +9,7 @@ type User struct {
 	Password        string             `json:"password"`
 	Username        string             `json:"username"`
 	UserId          string             `json:"userid"`
-	Profile_Pic_Url string             `json:"profile_pic_urlllll"`
+	Profile_Pic_Url string             `json:"profile_pic_url"`
 }
 
 type LoginUser struct {
