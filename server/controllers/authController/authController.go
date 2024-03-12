@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"net/http"
 
@@ -230,9 +231,41 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	var loggedInUser models.User
+	loggedInUser, err = getUser(loginUser.Username, userJwtToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status": "Some Error Occured",
+			"error":  err.Error(),
+		})
+		return
+	}
+
 	// Return successful login response with JWT token
 	c.JSON(http.StatusOK, gin.H{
 		"status":    "All Good! User Login Successful",
 		"Jwt_Token": userJwtToken,
+		"user":      loggedInUser,
 	})
+}
+
+func getUser(username, jwt string) (models.User, error) {
+	url := "http://192.168.135.132:8006/user/getuserbyusername/" + username + "?jwtkey=" + jwt
+	log.Println(url)
+	res, err := http.Get(url)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	if res.StatusCode == 200 {
+		var user models.User
+		err = json.NewDecoder(res.Body).Decode(&user)
+		if err != nil {
+			return models.User{}, err
+		}
+
+		return user, nil
+	}
+
+	return models.User{}, fmt.Errorf("some Error Occured :/")
 }

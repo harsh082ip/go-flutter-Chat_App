@@ -13,8 +13,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Class containing API methods related to authentication.
 class AuthApis {
-
-
   static String baseUrl = "http://192.168.135.132:8006";
 
   /// Method for signing up a user.
@@ -25,10 +23,10 @@ class AuthApis {
   /// - [email]: User's email address.
   /// - [password]: User's password.
   /// - [username]: User's chosen username.
-  static Future<void> signUp(String imgPath, String name, String email, String password, String username) async{
-    
+  static Future<void> signUp(String imgPath, String name, String email,
+      String password, String username) async {
     // Change the baseUrl Accordingly
-    
+
     var url = Uri.parse("$baseUrl/users/signup");
     print(url.toString());
 
@@ -40,7 +38,7 @@ class AuthApis {
       "username": username,
     });
 
-       // Check if the image path is not empty
+    // Check if the image path is not empty
     if (imgPath != "") {
       // Create a File object from the image path
       File imageFile = File(imgPath);
@@ -50,11 +48,13 @@ class AuthApis {
       var length = await imageFile.length();
       // Create a MultipartFile object with the image file stream
       var multipartFile = http.MultipartFile(
-        'profile_picture', // Field name for the file
-        stream, // Byte stream of the file
-        length, // Length of the file
-        filename: imageFile.path.split('/').last // Filename extracted from the file path
-      );
+          'profile_picture', // Field name for the file
+          stream, // Byte stream of the file
+          length, // Length of the file
+          filename: imageFile.path
+              .split('/')
+              .last // Filename extracted from the file path
+          );
 
       // Add the multipart file to the request
       request.files.add(multipartFile);
@@ -67,23 +67,27 @@ class AuthApis {
         // Successful sign-up
         print('Sign-up successful');
         Get.defaultDialog(
-          title: 'Sign Up Successful',
-          content: Text('Please login now'),
-          confirm: ElevatedButton(onPressed: () {}, child: Text('OK'))
-        );
+            title: 'Sign Up Successful',
+            content: Text('Please login now'),
+            confirm: ElevatedButton(onPressed: () {}, child: Text('OK')));
         Get.offAll(LoginPage());
-        Get.snackbar('Sign Up Successful', 'Please login now', backgroundColor: Colors.blue, snackPosition: SnackPosition.BOTTOM, colorText: Colors.white, );
+        Get.snackbar(
+          'Sign Up Successful',
+          'Please login now',
+          backgroundColor: Colors.blue,
+          snackPosition: SnackPosition.BOTTOM,
+          colorText: Colors.white,
+        );
       } else {
         // Failed sign-up
         print('Sign-up failed with status code: ${response.statusCode}');
         print('Response body: ${response.body}');
         Get.back();
         Get.defaultDialog(
-          title: 'Error While SignUp',
-          content: Center(
-            child: Text(response.body),
-          )
-        );
+            title: 'Error While SignUp',
+            content: Center(
+              child: Text(response.body),
+            ));
       }
     } catch (error) {
       print('Error occurred during sign-up: $error');
@@ -92,55 +96,52 @@ class AuthApis {
           title: 'Error While SignUp',
           content: Center(
             child: Text(error.toString()),
-          )
-        );
+          ));
     }
   }
 
-
-  static Future<void> login(String username, String password) async{
-
+  static Future<void> login(String username, String password) async {
     var url = Uri.parse("$baseUrl/users/login");
     print(url.toString());
-   
+
     var response = await http.post(url,
-      headers: <String, String> {
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: json.encode({
-        "username": username,
-        "password": password,
-      }));
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: json.encode({
+          "username": username,
+          "password": password,
+        }));
 
-      if (response.statusCode == 200) {
-        print(response.body);
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        var res = jsonDecode(response.body);
-        var token = res['Jwt_Token'];
-        prefs.setString('token', token);
+    if (response.statusCode == 200) {
+      print(response.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var res = jsonDecode(response.body);
+      var token = res['Jwt_Token'];
+      prefs.setString('token', token);
 
+      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      Map<String, dynamic> userJson = jsonResponse['user'];
+      User user = User.fromJson(userJson);
+      // User user = User.fromJson(jsonResponse);
+      LoggedInUserSingleton().setUser(user);
 
-    //     Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-    // User user = User.fromJson(jsonResponse);
-    // LoggedInUserSingleton().setUser(user);
-    
-    // User? current = LoggedInUserSingleton().getUser();
-    // if (current != null) {
-    //   log(current.email);
-    // }
-    
-        Get.offAll(HomePage());
-      } else {
-
-        Get.back();
-        Get.defaultDialog(
-          title: 'Error While Login',
-          content: Center(
-            child: Text('Error: ${response.body}'),
-          ),
-        );
-        print('Failed to login: ${response.body}');
-        print(response.statusCode);
+      User? current = LoggedInUserSingleton().getUser();
+      if (current != null) {
+        log("Email: " + current.email);
       }
+
+      Get.offAll(HomePage());
+    } else {
+      Get.back();
+      Get.defaultDialog(
+        title: 'Error While Login',
+        content: Center(
+          child: Text('Error: ${response.body}'),
+        ),
+      );
+      print('Failed to login: ${response.body}');
+      print(response.statusCode);
+    }
   }
 }

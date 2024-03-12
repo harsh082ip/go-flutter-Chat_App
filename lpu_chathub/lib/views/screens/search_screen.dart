@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lpu_chathub/controller/apis/search_api.dart';
 import 'package:lpu_chathub/models/user_model.dart';
+import 'package:lpu_chathub/views/screens/display_profile.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -82,9 +83,11 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),);
 
                               user = await SearchApis.searchUser(searchedText.text);
-                              log(user!.email.toString());
+                              if (user != null) {
+                                log(user!.email.toString());
                               log(user!.name.toString());
                               log(user!.profilePicUrl.toString());
+                              }
                             }
                             else {
                               print("Empty");
@@ -118,6 +121,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         InkWell(
                           onTap: () {
                             print('Pressed...');
+                            Get.to(() => DisplayProfile(user: user,));
                           },
                           child: Container(
                               color: Colors.white,
