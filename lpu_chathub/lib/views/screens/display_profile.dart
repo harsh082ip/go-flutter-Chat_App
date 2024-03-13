@@ -108,10 +108,11 @@ class _DisplayProfileState extends State<DisplayProfile> {
                     ElevatedButton(
                         onPressed: () {
                           log('Button Pressed');
-                          Get.snackbar('Adding', '',
+                          Get.snackbar('Adding...', '',
                               snackPosition: SnackPosition.BOTTOM,
                               colorText: Colors.white,
-                              backgroundColor: Colors.blue);
+                              backgroundColor: Colors.blue,
+                              duration: Duration(seconds: 1));
                           AddToHome.addUserToChats(
                               widget.user!.username.toString());
                         },
