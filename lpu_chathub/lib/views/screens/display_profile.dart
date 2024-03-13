@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lpu_chathub/const.dart';
 import 'package:lpu_chathub/controller/apis/add_to_recents.dart';
+import 'package:lpu_chathub/controller/apis/add_user_to_chats.dart';
 import 'package:lpu_chathub/models/user_model.dart';
 
 class DisplayProfile extends StatefulWidget {
@@ -107,6 +108,12 @@ class _DisplayProfileState extends State<DisplayProfile> {
                     ElevatedButton(
                         onPressed: () {
                           log('Button Pressed');
+                          Get.snackbar('Adding', '',
+                              snackPosition: SnackPosition.BOTTOM,
+                              colorText: Colors.white,
+                              backgroundColor: Colors.blue);
+                          AddToHome.addUserToChats(
+                              widget.user!.username.toString());
                         },
                         child: Text('Add to Chats'))
                   ],

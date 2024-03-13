@@ -2,6 +2,7 @@ package usersController
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,12 +18,14 @@ import (
 
 func AddUserToRecentChatsAndCreateRoom(c *gin.Context) {
 	// Extract parameters from the request
-	uid := c.Param("uid")
-	username := c.Query("username")
+	uid := c.Param("uid")                  // userid of the user using the app
+	username := c.Query("client2username") // this is user whom we are adding  (Present Client)
 	jwt_token := c.Query("jwtkey")
 	client1username := c.Query("client1username") // this is the user who is using the app, same user whose id is sent
 	client2username := username                   // user which we want to add
 
+	log.Println(uid)
+	log.Println(client1username)
 	// TODO: CHECK IF USERNAME AND UID BELONGS TO THE SAME USER
 
 	// Check if all necessary parameters are provided
@@ -56,7 +59,7 @@ func AddUserToRecentChatsAndCreateRoom(c *gin.Context) {
 			return
 		}
 
-		err = helpers.CheckIfUidAndUsernameOfSameUser(uid, username)
+		err = helpers.CheckIfUidAndUsernameOfSameUser(uid, client1username)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status": "Bad Request",
@@ -166,7 +169,7 @@ func AddUserToRecentChatsAndCreateRoom(c *gin.Context) {
 					return
 				}
 
-				c.JSON(http.StatusBadRequest, gin.H{
+				c.JSON(http.StatusOK, gin.H{
 					"status": "Usernames & Room already present",
 				})
 				return
