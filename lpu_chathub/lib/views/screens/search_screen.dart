@@ -22,6 +22,13 @@ class _SearchScreenState extends State<SearchScreen> {
   User? user;
   late Future<List<User>> _futureUsers = Future.value([]);
 
+  void refreshScreen() {
+    log('Refreshing...');
+    setState(() {
+      _futureUsers = FetchRecents.fetchRecentUsers();
+    }); // Trigger state change to refresh the screen
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -150,6 +157,16 @@ class _SearchScreenState extends State<SearchScreen> {
                                     child: CircularProgressIndicator(
                                         color: Colors.blue),
                                   );
+                                }
+                                // Check if snapshot.data is null
+                                if (snapshot.data == null ||
+                                    snapshot.data!.isEmpty) {
+                                  return Center(
+                                    child: Text(
+                                      "No User Found",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  );
                                 } else if (snapshot.hasError) {
                                   return Center(
                                       child: Text(
@@ -159,6 +176,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 }
 
                                 final users = snapshot.data!;
+
                                 return Expanded(
                                   child: ListView.builder(
                                       // physics: BouncingScrollPhysics(),
@@ -166,11 +184,16 @@ class _SearchScreenState extends State<SearchScreen> {
                                       itemBuilder: (context, index) {
                                         final fetchuser = users[index];
                                         return UserListTile(
-                                            name: fetchuser.name.toString(),
-                                            user_email:
-                                                fetchuser.email.toString(),
-                                            profile_pic_url:
-                                                fetchuser.profilePicUrl);
+                                          user: fetchuser,
+                                          name: fetchuser.name.toString(),
+                                          user_email:
+                                              fetchuser.email.toString(),
+                                          profile_pic_url:
+                                              fetchuser.profilePicUrl,
+                                          diplayTrailing: true,
+                                          refreshCallBack: () =>
+                                              refreshScreen(),
+                                        );
                                       }),
                                 );
                               }))
@@ -183,17 +206,21 @@ class _SearchScreenState extends State<SearchScreen> {
                           if (user !=
                               null) // Add a null check before accessing user properties
                             InkWell(
-                                onTap: () {
-                                  print('Pressed...');
-                                  Get.to(() => DisplayProfile(
-                                        user: user,
-                                      ));
-                                },
-                                child: UserListTile(
-                                    name: user!.name.toString(),
-                                    user_email: user!.email.toString(),
-                                    profile_pic_url:
-                                        user!.profilePicUrl.toString())),
+                              onTap: () {
+                                print('Pressed...');
+                                Get.to(() => DisplayProfile(
+                                      user: user,
+                                    ));
+                              },
+                              child: UserListTile(
+                                user: user,
+                                diplayTrailing: false,
+                                name: user!.name.toString(),
+                                user_email: user!.email.toString(),
+                                profile_pic_url: user!.profilePicUrl.toString(),
+                                refreshCallBack: () => refreshScreen(),
+                              ),
+                            ),
                         ],
                       ),
               ),

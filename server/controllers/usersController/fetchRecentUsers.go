@@ -115,7 +115,7 @@ func FetchRecentUsers(c *gin.Context) {
 		}
 
 		// No users found.
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"status": "No Users Found",
 			"error":  "Recent views may be empty",
 		})
