@@ -10,9 +10,11 @@ import 'package:http/http.dart' as http;
 
 class FetchRecents {
   static Future<List<User>> fetchRecentUsers() async {
-    User? user = await LoggedInUserSingleton().getUser();
-    String uid = user!.userid.toString();
-    String? token = await Token.getToken();
+    // User? user = await LoggedInUserSingleton().getUser();
+    // String uid = user!.userid.toString();
+
+    String uid = await LocalKeys.getUid();
+    String? token = await LocalKeys.getToken();
     String url = "${BaseUrl.baseUrl}/user/fetchrecentusers/$uid?jwtkey=$token";
     log(url);
     if (token != "") {

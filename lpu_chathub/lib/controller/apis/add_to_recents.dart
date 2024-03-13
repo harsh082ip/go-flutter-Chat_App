@@ -10,11 +10,13 @@ import 'package:http/http.dart' as http;
 class AddToRecentApis {
   static Future<void> addToRecents(String username) async {
     Get.snackbar('Here', 'Calling...');
-    String? token = await Token.getToken();
-    User? currentUser = LoggedInUserSingleton().getUser();
-    log(currentUser!.userid.toString());
+    String? token = await LocalKeys.getToken();
+    // User? currentUser = LoggedInUserSingleton().getUser();
+    // log(currentUser!.userid.toString());
+    String userId = await LocalKeys.getUid();
+
     String url =
-        "${BaseUrl.baseUrl}/user/addtorecentlyviewed/${currentUser.userid.toString()}?jwt_key=$token&username=$username";
+        "${BaseUrl.baseUrl}/user/addtorecentlyviewed/$userId?jwt_key=$token&username=$username";
     // log("Url" + url);
 
     if (token != "") {

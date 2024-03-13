@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:lpu_chathub/const.dart';
 import 'package:lpu_chathub/models/user_model.dart';
 import 'package:lpu_chathub/shared_res/loggedin_user_singleton.dart';
 import 'package:lpu_chathub/views/authentication/login.dart';
@@ -13,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Class containing API methods related to authentication.
 class AuthApis {
-  static String baseUrl = "http://192.168.135.132:8006";
+  // static String baseUrl = "http://192.168.135.132:8006";
 
   /// Method for signing up a user.
   ///
@@ -27,7 +28,7 @@ class AuthApis {
       String password, String username) async {
     // Change the baseUrl Accordingly
 
-    var url = Uri.parse("$baseUrl/users/signup");
+    var url = Uri.parse("${BaseUrl.baseUrl}/users/signup");
     print(url.toString());
 
     var request = http.MultipartRequest("POST", url);
@@ -101,7 +102,7 @@ class AuthApis {
   }
 
   static Future<void> login(String username, String password) async {
-    var url = Uri.parse("$baseUrl/users/login");
+    var url = Uri.parse("${BaseUrl.baseUrl}/users/login");
     print(url.toString());
 
     var response = await http.post(url,
@@ -125,6 +126,10 @@ class AuthApis {
       User user = User.fromJson(userJson);
       // User user = User.fromJson(jsonResponse);
       LoggedInUserSingleton().setUser(user);
+      // set uid, username and profile_pic_url in shared prefs
+      prefs.setString('uid', user.userid);
+      prefs.setString('username', user.username);
+      prefs.setString('profile_pic_url', user.profilePicUrl);
 
       User? current = LoggedInUserSingleton().getUser();
       if (current != null) {

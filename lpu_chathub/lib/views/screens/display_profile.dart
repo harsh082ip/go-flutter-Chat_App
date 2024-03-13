@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -99,6 +101,14 @@ class _DisplayProfileState extends State<DisplayProfile> {
                         style: TextStyle(color: Colors.white, fontSize: 22.0),
                       ),
                     ),
+                    SizedBox(
+                      height: 30.0,
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          log('Button Pressed');
+                        },
+                        child: Text('Add to Chats'))
                   ],
                 ),
               )
