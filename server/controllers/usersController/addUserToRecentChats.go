@@ -90,7 +90,7 @@ func AddUserToRecentChatsAndCreateRoom(c *gin.Context) {
 
 		// If all conditions met, update usernames if not present
 		if usernameExists && UidExists && client1usernameExists && docExists {
-			status, _ := helpers.HasElement(collName, username, "usernames")
+			status, _ := helpers.HasElement(collName, username, uid, "usernames")
 			if !status {
 				objID, err := primitive.ObjectIDFromHex(uid)
 				if err != nil {

@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AppColors {
   static const Color primaryColor = Color.fromARGB(255, 16, 26, 36);
+  static const Color appBarColor = Color.fromARGB(255, 32, 41, 58);
 }
 
 class BaseUrl {

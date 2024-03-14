@@ -2,8 +2,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:lpu_chathub/controller/apis/fetch_home.dart';
 import 'package:lpu_chathub/models/user_model.dart';
+import 'package:lpu_chathub/views/screens/chats/chat_screen.dart';
 import 'package:lpu_chathub/views/screens/search_screen.dart';
 import 'package:lpu_chathub/widgets/user_list_tile.dart';
 
@@ -41,8 +43,12 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  _refreshScreen() {
+  Future<void> _refreshScreen() async {
     log('Refresh Required');
+    setState(() {
+      _futureUsers = FetchHomeApis.fetchHomeData();
+    });
+    // return await Future.delayed(Duration(seconds: 2));
   }
 
   @override
@@ -94,7 +100,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Expanded(
-              child: FutureBuilder(
+              child: FutureBuilder<List<User>>(
                 future: _futureUsers,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -120,19 +126,30 @@ class _HomePageState extends State<HomePage> {
                   }
 
                   final users = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: users.length,
-                    itemBuilder: (context, index) {
-                      final fetchuser = users[index];
-                      return UserListTile(
-                        user: fetchuser,
-                        name: fetchuser.name.toString(),
-                        user_email: fetchuser.email.toString(),
-                        profile_pic_url: fetchuser.profilePicUrl,
-                        diplayTrailing: false,
-                        refreshCallBack: () => _refreshScreen(),
-                      );
-                    },
+                  return LiquidPullToRefresh(
+                    animSpeedFactor: 6.0,
+                    onRefresh: _refreshScreen,
+                    color: Color.fromARGB(255, 44, 50, 56),
+                    height: 200,
+                    showChildOpacityTransition: true,
+                    // animSpeedFactor: 10,
+                    child: ListView.builder(
+                      itemCount: users.length,
+                      itemBuilder: (context, index) {
+                        final fetchuser = users[index];
+                        return InkWell(
+                          onTap: () => Get.to(ChatScreen(user: fetchuser)),
+                          child: UserListTile(
+                            user: fetchuser,
+                            name: fetchuser.name.toString(),
+                            user_email: fetchuser.email.toString(),
+                            profile_pic_url: fetchuser.profilePicUrl,
+                            diplayTrailing: false,
+                            refreshCallBack: () => _refreshScreen(),
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               ),
