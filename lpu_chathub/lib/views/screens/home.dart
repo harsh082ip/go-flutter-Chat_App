@@ -142,10 +142,10 @@ class _HomePageState extends State<HomePage> {
                           child: UserListTile(
                             user: fetchuser,
                             name: fetchuser.name.toString(),
-                            user_email: fetchuser.email.toString(),
-                            profile_pic_url: fetchuser.profilePicUrl,
-                            diplayTrailing: false,
-                            refreshCallBack: () => _refreshScreen(),
+                            userEmail: fetchuser.email.toString(),
+                            profilePicUrl: fetchuser.profilePicUrl,
+                            displayTrailing: false,
+                            refreshCallback: () => _refreshScreen(),
                           ),
                         );
                       },

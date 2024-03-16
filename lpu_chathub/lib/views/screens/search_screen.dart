@@ -186,12 +186,11 @@ class _SearchScreenState extends State<SearchScreen> {
                                         return UserListTile(
                                           user: fetchuser,
                                           name: fetchuser.name.toString(),
-                                          user_email:
-                                              fetchuser.email.toString(),
-                                          profile_pic_url:
+                                          userEmail: fetchuser.email.toString(),
+                                          profilePicUrl:
                                               fetchuser.profilePicUrl,
-                                          diplayTrailing: true,
-                                          refreshCallBack: () =>
+                                          displayTrailing: true,
+                                          refreshCallback: () =>
                                               refreshScreen(),
                                         );
                                       }),
@@ -214,11 +213,11 @@ class _SearchScreenState extends State<SearchScreen> {
                               },
                               child: UserListTile(
                                 user: user,
-                                diplayTrailing: false,
+                                displayTrailing: false,
                                 name: user!.name.toString(),
-                                user_email: user!.email.toString(),
-                                profile_pic_url: user!.profilePicUrl.toString(),
-                                refreshCallBack: () => refreshScreen(),
+                                userEmail: user!.email.toString(),
+                                profilePicUrl: user!.profilePicUrl.toString(),
+                                refreshCallback: () => refreshScreen(),
                               ),
                             ),
                         ],

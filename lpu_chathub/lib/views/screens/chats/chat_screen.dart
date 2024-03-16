@@ -20,6 +20,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late WebSocketChannel channel;
   List<String> messages = [];
   String username = "username";
+  bool isCopyTriggered = false;
 
   @override
   void initState() {
@@ -44,7 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
     roomID = "RoomID";
     channel.stream.listen((event) {
       setState(() {
-        messages.add(event);
+        messages.insert(0, event);
       });
     });
   }
@@ -67,6 +68,16 @@ class _ChatScreenState extends State<ChatScreen> {
         appBar: AppBar(
           iconTheme: IconThemeData(color: Colors.white),
           backgroundColor: AppColors.appBarColor,
+          actions: [
+            isCopyTriggered
+                ? IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.copy,
+                      color: Colors.white,
+                    ))
+                : Container()
+          ],
           title: Row(
             children: [
               CircleAvatar(
@@ -94,6 +105,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: Container(
                         color: AppColors.primaryColor,
                         child: ListView.builder(
+                          reverse: true,
                           itemCount: messages.length,
                           itemBuilder: (context, index) {
                             final jsonMsg = jsonDecode(messages[index]);
@@ -103,31 +115,39 @@ class _ChatScreenState extends State<ChatScreen> {
                             if (msg != "A new user has joined the room") {
                               // Check for the specific message
                               return username == msgUsername
-                                  ? Container(
-                                      alignment: Alignment.topRight,
-                                      margin: const EdgeInsets.only(
-                                        top: 8.0,
-                                        right: 8.0,
-                                      ), // Add margin for spacing
+                                  ? InkWell(
+                                      onLongPress: () {
+                                        setState(() {
+                                          isCopyTriggered = true;
+                                        });
+                                      },
                                       child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 8.0,
-                                          horizontal: 12.0,
-                                        ), // Add padding for spacing
-                                        decoration: const BoxDecoration(
-                                          color: Colors.red,
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(16.0),
-                                            bottomLeft: Radius.circular(16.0),
-                                            bottomRight: Radius.circular(16.0),
+                                        alignment: Alignment.topRight,
+                                        margin: const EdgeInsets.only(
+                                          top: 8.0,
+                                          right: 8.0,
+                                        ), // Add margin for spacing
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0,
+                                            horizontal: 12.0,
+                                          ), // Add padding for spacing
+                                          decoration: const BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(16.0),
+                                              bottomLeft: Radius.circular(16.0),
+                                              bottomRight:
+                                                  Radius.circular(16.0),
+                                            ),
                                           ),
-                                        ),
-                                        child: Text(
-                                          msg,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16.0,
+                                          child: Text(
+                                            msg,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16.0,
+                                            ),
                                           ),
                                         ),
                                       ),

@@ -1,52 +1,65 @@
-import 'dart:developer';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lpu_chathub/const.dart';
 import 'package:lpu_chathub/controller/apis/remove_from_recents.dart';
 import 'package:lpu_chathub/models/user_model.dart';
 
 class UserListTile extends StatelessWidget {
   final String name;
-  final String profile_pic_url;
-  final String user_email;
-  final bool diplayTrailing;
+  final String profilePicUrl;
+  final String userEmail;
+  final bool displayTrailing;
   final User? user;
-  final VoidCallback refreshCallBack;
-  UserListTile(
-      {super.key,
-      required this.name,
-      required this.user_email,
-      required this.profile_pic_url,
-      required this.diplayTrailing,
-      required this.user,
-      required this.refreshCallBack});
+  final VoidCallback refreshCallback;
+
+  UserListTile({
+    Key? key,
+    required this.name,
+    required this.userEmail,
+    required this.profilePicUrl,
+    required this.displayTrailing,
+    required this.user,
+    required this.refreshCallback,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
+    return Card(
+      color: AppColors.appBarColor,
+      elevation: 4,
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: ListTile(
-        title: Text(name), // Use user!.name with null check operator
+        contentPadding: EdgeInsets.all(16),
         leading: CircleAvatar(
+          radius: 24,
           backgroundColor: Colors.teal,
-          backgroundImage: NetworkImage(profile_pic_url),
+          backgroundImage: NetworkImage(profilePicUrl),
         ),
-        subtitle: Text(user_email),
-        trailing: diplayTrailing
+        title: Text(
+          name,
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        subtitle: Text(
+          userEmail,
+          style: TextStyle(color: Colors.white),
+        ),
+        trailing: displayTrailing
             ? IconButton(
                 onPressed: () async {
                   bool refreshRequired =
                       await RemoveFromRecentApis.removeFromRecents(
                           user!.username.toString());
                   if (refreshRequired) {
-                    // setState(() {
-                    //   // refreshCallback();
-                    // });
-                    log('called');
-                    refreshCallBack();
+                    refreshCallback();
                   }
                 },
-                icon: Icon(CupertinoIcons.multiply))
+                icon: Icon(
+                  Icons.clear,
+                  color: Colors.red,
+                ),
+              )
             : null,
       ),
     );
