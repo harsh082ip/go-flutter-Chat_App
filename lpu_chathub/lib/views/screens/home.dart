@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 16, 26, 36),
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'CyberSec',
           style: TextStyle(color: Colors.white),
         ),
@@ -64,23 +64,62 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () {
-              Get.to(SearchScreen());
+              Get.to(const SearchScreen());
             },
             icon: const Icon(Icons.search),
-            iconSize: 30,
+            iconSize: 28,
             color: Colors.white,
           ),
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.notification_important),
-            iconSize: 30,
+            iconSize: 28,
             color: Colors.white,
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.more_vert),
-            iconSize: 30,
-            color: Colors.white,
+          PopupMenuButton<int>(
+            icon: Icon(
+              Icons.more_vert,
+              color: Colors.white,
+              size: 28,
+            ),
+            itemBuilder: (context) => [
+              // popupmenu item 1
+              const PopupMenuItem(
+                value: 1,
+                // row has two child icon and text.
+                child: Row(
+                  children: [
+                    Icon(Icons.star),
+                    SizedBox(
+                      // sized box with width 10
+                      width: 10,
+                    ),
+                    Text("Get The App")
+                  ],
+                ),
+              ),
+              // popupmenu item 2
+              const PopupMenuItem(
+                value: 2,
+                // row has two child icon and text
+                child: Row(
+                  children: [
+                    Icon(Icons.chrome_reader_mode),
+                    SizedBox(
+                      // sized box with width 10
+                      width: 10,
+                    ),
+                    Text("About")
+                  ],
+                ),
+              ),
+            ],
+            offset: Offset(0, 100),
+            color: Colors.grey,
+            elevation: 2,
+            onSelected: (value) {
+              print(value);
+            },
           ),
         ],
       ),
@@ -89,8 +128,9 @@ class _HomePageState extends State<HomePage> {
           children: [
             Container(
               alignment: Alignment.topLeft,
-              margin: EdgeInsets.only(top: 10.0, left: 15.0, bottom: 15.0),
-              child: Text(
+              margin:
+                  const EdgeInsets.only(top: 10.0, left: 15.0, bottom: 15.0),
+              child: const Text(
                 'Your Chats',
                 style: TextStyle(
                   color: Colors.white,
@@ -104,13 +144,13 @@ class _HomePageState extends State<HomePage> {
                 future: _futureUsers,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
+                    return const Center(
                       child: CircularProgressIndicator(color: Colors.blue),
                     );
                   }
 
                   if (snapshot.data == null || snapshot.data!.isEmpty) {
-                    return Center(
+                    return const Center(
                       child: Text(
                         "No User Found",
                         style: TextStyle(color: Colors.white),
@@ -129,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                   return LiquidPullToRefresh(
                     animSpeedFactor: 6.0,
                     onRefresh: _refreshScreen,
-                    color: Color.fromARGB(255, 44, 50, 56),
+                    color: const Color.fromARGB(255, 44, 50, 56),
                     height: 200,
                     showChildOpacityTransition: true,
                     // animSpeedFactor: 10,
@@ -154,10 +194,6 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
             ),
-            // Text(
-            //   'data',
-            //   style: TextStyle(color: Colors.white),
-            // )
           ],
         ),
       ),

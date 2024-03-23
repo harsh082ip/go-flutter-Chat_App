@@ -19,7 +19,7 @@ func main() {
 	hub := ws.NewHub()
 	wsHandler := ws.NewHandler(hub)
 	go hub.Run()
-	ws.SaveChatsToDatabase()
+	go ws.SaveChatsToDatabase()
 
 	routes.AuthRoutes(router)
 	routes.MiscRoutes(router)

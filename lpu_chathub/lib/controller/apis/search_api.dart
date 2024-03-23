@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:lpu_chathub/const.dart';
 import 'package:lpu_chathub/models/user_model.dart';
 import 'package:lpu_chathub/shared_res/loggedin_user_singleton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +24,7 @@ class SearchApis {
       log(decodeToken.toString());
       if (logged_in_username != username) {
         var uri = Uri.parse(
-            "$baseUrl/user/getuserbyusername/$username?jwtkey=$token");
+            "${BaseUrl.baseUrl}/user/getuserbyusername/$username?jwtkey=$token");
         print(uri.toString());
 
         var response = await http.get(uri);

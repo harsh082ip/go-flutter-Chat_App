@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 class AddToRecentApis {
   static Future<void> addToRecents(String username) async {
-    Get.snackbar('Here', 'Calling...');
+    // Get.snackbar('Here', 'Calling...');
     String? token = await LocalKeys.getToken();
     // User? currentUser = LoggedInUserSingleton().getUser();
     // log(currentUser!.userid.toString());
