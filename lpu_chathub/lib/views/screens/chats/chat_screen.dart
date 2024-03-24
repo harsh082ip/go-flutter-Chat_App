@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:lpu_chathub/const.dart';
+import 'package:lpu_chathub/controller/apis/fetch_chats_from_db.dart';
 import 'package:lpu_chathub/controller/apis/get_room_id.dart';
+import 'package:lpu_chathub/models/conversation_model.dart';
 import 'package:lpu_chathub/models/user_model.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
@@ -21,6 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
   List<String> messages = [];
   String username = "username";
   bool isCopyTriggered = false;
+  late ApiResponse apiResponse;
 
   @override
   void initState() {
@@ -37,6 +41,11 @@ class _ChatScreenState extends State<ChatScreen> {
   runWebSocket(String roomId) async {
     String? uid = await LocalKeys.getUid();
     username = await LocalKeys.getUsername();
+
+    // fetch previous chats (if any)
+    apiResponse = await FetchChats.fetchChatsFromDB(roomID);
+    // now your work is to fetch previous chats on UI (is present)
+
     String url =
         "ws://192.168.135.132:8006/ws/joinroom/$roomID?uid=$uid&username=$username";
     print(url);
@@ -64,6 +73,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController messageController = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    log('build...');
     return Scaffold(
         appBar: AppBar(
           iconTheme: IconThemeData(color: Colors.white),
@@ -105,84 +115,31 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: Container(
                         color: AppColors.primaryColor,
                         child: ListView.builder(
-                          reverse: true,
-                          itemCount: messages.length,
+                          reverse:
+                              true, // Set reverse to true to display messages from bottom to top
+                          itemCount:
+                              apiResponse.messages.length + messages.length,
                           itemBuilder: (context, index) {
-                            final jsonMsg = jsonDecode(messages[index]);
-                            final msg = jsonMsg['content'];
-                            final msgUsername = jsonMsg['username'];
-
-                            if (msg != "A new user has joined the room") {
-                              // Check for the specific message
-                              return username == msgUsername
-                                  ? InkWell(
-                                      onLongPress: () {
-                                        setState(() {
-                                          isCopyTriggered = true;
-                                        });
-                                      },
-                                      child: Container(
-                                        alignment: Alignment.topRight,
-                                        margin: const EdgeInsets.only(
-                                          top: 8.0,
-                                          right: 8.0,
-                                        ), // Add margin for spacing
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0,
-                                            horizontal: 12.0,
-                                          ), // Add padding for spacing
-                                          decoration: const BoxDecoration(
-                                            color: Colors.red,
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(16.0),
-                                              bottomLeft: Radius.circular(16.0),
-                                              bottomRight:
-                                                  Radius.circular(16.0),
-                                            ),
-                                          ),
-                                          child: Text(
-                                            msg,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16.0,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : Container(
-                                      alignment: Alignment.topLeft,
-                                      margin: const EdgeInsets.only(
-                                        top: 8.0,
-                                        left: 8.0,
-                                      ), // Add margin for spacing
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 8.0,
-                                          horizontal: 12.0,
-                                        ), // Add padding for spacing
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue,
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(16.0),
-                                            bottomLeft: Radius.circular(16.0),
-                                            bottomRight: Radius.circular(16.0),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          msg,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16.0,
-                                          ),
-                                        ),
-                                      ),
-                                    );
+                            if (index < apiResponse.messages.length) {
+                              log(index.toString());
+                              final msg = apiResponse.messages[
+                                  apiResponse.messages.length - index - 1];
+                              return buildMessage(msg.content, msg.username);
                             } else {
-                              return Container(); // Return an empty container for the excluded message
+                              final adjustedIndex =
+                                  index - apiResponse.messages.length;
+                              print(adjustedIndex.toString());
+                              final jsonMsg =
+                                  jsonDecode(messages[adjustedIndex]);
+                              final msg = jsonMsg['content'];
+                              final msgUsername = jsonMsg['username'];
+
+                              if (msg != "A new user has joined the room") {
+                                // Display messages received via WebSocket
+                                return buildMessage(msg, msgUsername);
+                              } else {
+                                return Container(); // Return an empty container for the excluded message
+                              }
                             }
                           },
                         ),
@@ -240,5 +197,74 @@ class _ChatScreenState extends State<ChatScreen> {
             : Center(
                 child: CircularProgressIndicator(color: Colors.blue),
               ));
+  }
+
+  Widget buildMessage(String content, String username) {
+    return username == this.username
+        ? InkWell(
+            onLongPress: () {
+              setState(() {
+                isCopyTriggered = true;
+              });
+            },
+            child: Container(
+              alignment: Alignment.topRight,
+              margin: const EdgeInsets.only(
+                top: 8.0,
+                right: 8.0,
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 12.0,
+                ),
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16.0),
+                    bottomLeft: Radius.circular(16.0),
+                    bottomRight: Radius.circular(16.0),
+                  ),
+                ),
+                child: Text(
+                  content,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16.0,
+                  ),
+                ),
+              ),
+            ),
+          )
+        : Container(
+            alignment: Alignment.topLeft,
+            margin: const EdgeInsets.only(
+              top: 8.0,
+              left: 8.0,
+            ),
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 12.0,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(16.0),
+                  bottomLeft: Radius.circular(16.0),
+                  bottomRight: Radius.circular(16.0),
+                ),
+              ),
+              child: Text(
+                content,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0,
+                ),
+              ),
+            ),
+          );
   }
 }

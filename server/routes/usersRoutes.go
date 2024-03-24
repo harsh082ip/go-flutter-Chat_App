@@ -17,4 +17,5 @@ func UserRoutes(incomingRoutes *gin.Engine, wsHandler *ws.Handler) {
 	incomingRoutes.GET("/user/removehomeuser/:uid", usersController.RemoveHomeUsers)
 	incomingRoutes.GET("/user/getroomidbyusernames", usersController.GetRoomIDByUsernames)
 	incomingRoutes.GET("/ws/joinroom/:roomId", wsHandler.JoinRoom)
+	incomingRoutes.GET("/user/fetchchatsfromdatabase/:roomId", usersController.FetchChatsFromDB)
 }
