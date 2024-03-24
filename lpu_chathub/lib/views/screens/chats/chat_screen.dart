@@ -47,7 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
     // now your work is to fetch previous chats on UI (is present)
 
     String url =
-        "ws://192.168.135.132:8006/ws/joinroom/$roomID?uid=$uid&username=$username";
+        "ws://192.168.122.1:8006/ws/joinroom/$roomID?uid=$uid&username=$username";
     print(url);
     final wsUrl = Uri.parse(url);
     channel = WebSocketChannel.connect(wsUrl);

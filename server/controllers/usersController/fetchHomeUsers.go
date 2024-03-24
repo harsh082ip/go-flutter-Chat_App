@@ -118,10 +118,11 @@ func FetchHomeUsers(c *gin.Context) {
 		}
 
 		// Return error if no users are found.
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"status": "No Users Found",
 			"error":  "Recent views may be empty",
 		})
+		return
 
 	} else {
 		// Return error if necessary details are missing.

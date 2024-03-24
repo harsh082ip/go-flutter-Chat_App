@@ -85,7 +85,7 @@ func FetchRecentUsers(c *gin.Context) {
 		cursor, err := usersColl.Find(context.TODO(), bson.M{"username": bson.M{"$in": recentView.UserIDs}})
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
-				c.JSON(http.StatusInternalServerError, gin.H{
+				c.JSON(http.StatusOK, gin.H{
 					"status": "No users found",
 					"error":  err.Error(),
 				})

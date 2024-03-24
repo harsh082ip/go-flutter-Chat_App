@@ -250,7 +250,7 @@ func Login(c *gin.Context) {
 }
 
 func getUser(username, jwt string) (models.User, error) {
-	url := "http://192.168.135.132:8006/user/getuserbyusername/" + username + "?jwtkey=" + jwt
+	url := "http://192.168.122.1:8006/user/getuserbyusername/" + username + "?jwtkey=" + jwt
 	log.Println(url)
 	res, err := http.Get(url)
 	if err != nil {

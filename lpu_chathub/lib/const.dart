@@ -7,7 +7,7 @@ class AppColors {
 }
 
 class BaseUrl {
-  static const String baseUrl = "http://192.168.135.132:8006";
+  static const String baseUrl = "http://192.168.122.1:8006";
 }
 
 class LocalKeys {
